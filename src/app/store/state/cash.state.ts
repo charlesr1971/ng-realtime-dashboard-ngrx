@@ -1,4 +1,4 @@
-import { ITransaction } from 'src/app/models/Transaction.model';
+import { ITransaction } from 'src/app/core/models/Transaction.model';
 
 export interface ITransactionState {
   transactions: ITransaction[];

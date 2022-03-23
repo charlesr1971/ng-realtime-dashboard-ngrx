@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { webSocket } from 'rxjs/webSocket';
-import { DataService } from './services/data.service';
+import { DataService } from './core/services/data.service';
 import { Observable } from 'rxjs';
 import { of } from 'rxjs';
 import { UIChart } from 'primeng/chart';

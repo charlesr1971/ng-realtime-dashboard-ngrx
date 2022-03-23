@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { DataService } from 'src/app/services/data.service';
+import { DataService } from 'src/app/core/services/data.service';
 import { UIChart } from 'primeng/chart';
 
 @Component({

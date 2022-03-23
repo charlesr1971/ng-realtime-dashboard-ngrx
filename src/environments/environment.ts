@@ -4,7 +4,16 @@
 
 export const environment = {
   production: false,
-  wsEndpoint: 'ws://localhost:8081'
+  wsEndpoint: 'ws://localhost:8080/taskservice/update',
+  reconnectInterval: 2000,
+  restEndpointUri: 'http://localhost:8080/taskservice/api/v1',
+  restApiCreateCustomTask: 'task',
+  restApiReadCustomTask: 'task',
+  restApiReadCustomTasks: 'task',
+  restApiUpdateCustomTask: 'task',
+  restApiPatchCustomTask: 'task',
+  restApiDeleteCustomTask: 'task',
+  restApiDeleteCustomTasks: 'task'
 };
 
 /*

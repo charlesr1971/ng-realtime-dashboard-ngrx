@@ -5,13 +5,13 @@ import {
   ViewEncapsulation,
   ChangeDetectionStrategy
 } from '@angular/core';
-import { DataService } from '../services/data.service';
+import { DataService } from '../core/services/data.service';
 import { Observable, Subject } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { selectTransactionsStream } from '../store/selectors/transaction.selector';
-import { IAppState } from '../store/state/app.state';
+import { AppState } from '../store/state/app.state';
 import { GetTransactions } from '../store/actions/cash.action';
-import { ITransaction } from '../models/Transaction.model';
+import { ITransaction } from '../core/models/Transaction.model';
 import { tap, map } from 'rxjs/operators';
 
 @Component({
@@ -25,7 +25,7 @@ export class LiveTableComponent implements OnInit, OnDestroy {
 
 
   trade$ = this.store.pipe(select(selectTransactionsStream));
-  constructor(private service: DataService, private store: Store<IAppState>) {
+  constructor(private service: DataService, private store: Store<AppState>) {
       this.store.dispatch(new GetTransactions({}));
   }
 
