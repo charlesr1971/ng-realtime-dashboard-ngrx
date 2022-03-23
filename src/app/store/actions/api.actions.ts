@@ -22,8 +22,8 @@ const patchCustomTaskSuccess = createAction('[Api API] Patch Custom Task Success
 const patchCustomTaskFailure = createAction('[Api API] Patch Custom Task Fail', props<ApiErrorResponse>());
 const patchCustomTaskNotFound = createAction('[Api API] Patch Custom Task Not Found', props<ApiErrorResponse>());
 
-const updateCustomTask = createAction('[Api API] Update Custom Task', props<{ customTask: CustomTask }>());
-const updateCustomTaskSuccess = createAction('[Api API] Update Custom Task Success', props<{ customTask: CustomTask }>());
+const updateCustomTask = createAction('[Api API] Update Custom Task', props<{ id: string, customTask: CustomTask }>());
+const updateCustomTaskSuccess = createAction('[Api API] Update Custom Task Success', props<{ id: string, customTask: CustomTask }>());
 const updateCustomTaskFailure = createAction('[Api API] Update Custom Task Fail', props<ApiErrorResponse>());
 const updateCustomTaskNotFound = createAction('[Api API] Update Custom Task Not Found', props<ApiErrorResponse>());
 
@@ -36,8 +36,6 @@ const deleteCustomTasks = createAction('[Api API] Delete Custom Tasks', props<{ 
 const deleteCustomTasksSuccess = createAction('[Api API] Delete Custom Tasks Success', props<{ id: string }>());
 const deleteCustomTasksFailure = createAction('[Api API] Delete Custom Tasks Fail', props<ApiErrorResponse>());
 const deleteCustomTasksNotFound = createAction('[Api API] Delete Custom Tasks Not Found', props<ApiErrorResponse>());
-
-
 
 export const ApiActions = {
   createCustomTask,

@@ -13,6 +13,7 @@ import { ApiActions } from '../actions/api.actions';
 export interface CustomTasksState extends EntityState<CustomTask> {
   error: ErrorState;
   status: EntityStatus;
+  selectedId: string;
 }
 
 export const apiCustomTasksEntityAdapter: EntityAdapter<CustomTask> = createEntityAdapter<CustomTask>({
@@ -22,10 +23,79 @@ export const apiCustomTasksEntityAdapter: EntityAdapter<CustomTask> = createEnti
 export const initialCustomTasksState: CustomTasksState = apiCustomTasksEntityAdapter.getInitialState({
   error: null,
   status: EntityStatus.LOADING,
+  selectedId: ''
 });
 
 export const apiCustomTasksReducer = createReducer(
   initialCustomTasksState,
+
+  on(
+    ApiActions.createCustomTask,
+    (state): CustomTasksState => ({
+      ...state,
+      error: null,
+      status: EntityStatus.LOADING,
+    })
+  ),
+  on(
+    ApiActions.createCustomTaskSuccess,
+    (state, { customTask }): CustomTasksState =>
+    apiCustomTasksEntityAdapter.addOne(customTask, {
+        ...state,
+        status: EntityStatus.DONE,
+      })
+  ),
+  on(
+    ApiActions.createCustomTaskFailure,
+    (state): CustomTasksState => ({
+      ...state,
+      status: EntityStatus.ERROR,
+      error: { messageKey: 'API_COMMON.CUSTOM_TASKS_LOAD_ERROR' },
+    })
+  ),
+  on(
+    ApiActions.createCustomTaskNotFound,
+    (state): CustomTasksState => ({
+      ...state,
+      status: EntityStatus.NOT_FOUND,
+      error: { messageKey: 'API_COMMON.CUSTOM_TASKS_NOT_FOUND' },
+    })
+  ),
+
+  on(
+    ApiActions.readCustomTask,
+    (state, { id }): CustomTasksState => ({
+      ...state,
+      error: null,
+      status: EntityStatus.LOADING,
+      selectedId: id,
+    })
+  ),
+  on(
+    ApiActions.readCustomTaskSuccess,
+    (state, { customTask }): CustomTasksState =>
+    apiCustomTasksEntityAdapter.addOne(customTask, {
+        ...state,
+        status: EntityStatus.DONE,
+      })
+  ),
+  on(
+    ApiActions.readCustomTaskFailure,
+    (state): CustomTasksState => ({
+      ...state,
+      status: EntityStatus.ERROR,
+      error: { messageKey: 'API_COMMON.CUSTOM_TASKS_LOAD_ERROR' },
+    })
+  ),
+  on(
+    ApiActions.readCustomTaskNotFound,
+    (state): CustomTasksState => ({
+      ...state,
+      status: EntityStatus.NOT_FOUND,
+      error: { messageKey: 'API_COMMON.CUSTOM_TASKS_NOT_FOUND' },
+    })
+  ),
+
   on(
     ApiActions.readCustomTasks,
     (state): CustomTasksState => ({
@@ -47,9 +117,94 @@ export const apiCustomTasksReducer = createReducer(
     (state): CustomTasksState => ({
       ...state,
       status: EntityStatus.ERROR,
-      error: { messageKey: 'API_COMMON.ORDER_ITEMS_LOAD_ERROR' },
+      error: { messageKey: 'API_COMMON.CUSTOM_TASKS_LOAD_ERROR' },
     })
-  )
+  ),
+  on(
+    ApiActions.readCustomTasksNotFound,
+    (state): CustomTasksState => ({
+      ...state,
+      status: EntityStatus.NOT_FOUND,
+      error: { messageKey: 'API_COMMON.CUSTOM_TASKS_NOT_FOUND' },
+    })
+  ),
+
+  on(
+    ApiActions.patchCustomTask,
+    (state): CustomTasksState => ({
+      ...state,
+      status: EntityStatus.UPDATING,
+      error: null
+    })
+  ),
+  on(
+    ApiActions.patchCustomTaskSuccess,
+    (state, { customTask }): CustomTasksState => {
+      return apiCustomTasksEntityAdapter.upsertOne(customTask, {
+        ...state,
+        status: EntityStatus.DONE,
+        error: null,
+      });
+    }
+  ),
+  on(
+    ApiActions.patchCustomTaskFailure,
+    (state): CustomTasksState => ({
+      ...state,
+      status: EntityStatus.ERROR,
+      error: { messageKey: 'API_COMMON.CUSTOM_TASKS_LOAD_ERROR' },
+    })
+  ),
+  on(
+    ApiActions.patchCustomTaskNotFound,
+    (state): CustomTasksState => ({
+      ...state,
+      status: EntityStatus.NOT_FOUND,
+      error: { messageKey: 'API_COMMON.CUSTOM_TASKS_NOT_FOUND' },
+    })
+  ),
+
+  on(
+    ApiActions.updateCustomTask,
+    (state): CustomTasksState => ({
+      ...state,
+      status: EntityStatus.UPDATING,
+      error: null
+    })
+  ),
+  on(
+    ApiActions.updateCustomTaskSuccess,
+    (state, { id, customTask }): CustomTasksState => {
+      const update: Update<CustomTask> = {
+        id,
+        changes: {
+          ...customTask
+        },
+      };
+      return apiCustomTasksEntityAdapter.updateOne(update, {
+        ...state,
+        status: EntityStatus.DONE,
+        error: null,
+      });
+    }
+  ),
+  on(
+    ApiActions.updateCustomTaskFailure,
+    (state): CustomTasksState => ({
+      ...state,
+      status: EntityStatus.ERROR,
+      error: { messageKey: 'API_COMMON.CUSTOM_TASKS_LOAD_ERROR' },
+    })
+  ),
+  on(
+    ApiActions.updateCustomTaskNotFound,
+    (state): CustomTasksState => ({
+      ...state,
+      status: EntityStatus.NOT_FOUND,
+      error: { messageKey: 'API_COMMON.CUSTOM_TASKS_NOT_FOUND' },
+    })
+  ),
+
 );
 /** CUSTOM TASKS - END */
 
