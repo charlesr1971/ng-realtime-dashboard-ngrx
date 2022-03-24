@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="ng-inventor-column">
+  <!-- <div class="ng-inventor-column">
     <app-inventory></app-inventory>
   </div>
   <div class="ng-cash-column">
@@ -7,7 +7,16 @@
   </div>
   <div class="ng-cash-month-column">
     <app-monthly-cash></app-monthly-cash>
-  </div>
+  </div> -->
+  <ng-container *ngIf="gridOptions">
+    <ag-grid-angular
+      #agGrid
+      style="width: 99%; height: 600px;"
+      class="ag-theme-alpine"
+      [gridOptions]="gridOptions"
+  >
+  </ag-grid-angular>
+</ng-container>
 </div>
-<app-live-table></app-live-table>
+<!-- <app-live-table></app-live-table> -->
 <router-outlet></router-outlet>

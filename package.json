@@ -26,6 +26,8 @@
     "@ngrx/router-store": "^8.3.0",
     "@ngrx/store": "^8.3.0",
     "@ngrx/store-devtools": "^8.3.0",
+    "ag-grid-angular": "^27.1.1",
+    "ag-grid-community": "^27.1.0",
     "chart.js": "^2.9.4",
     "primeicons": "^2.0.0",
     "primeng": "^8.0.2",

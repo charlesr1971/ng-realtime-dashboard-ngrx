@@ -1,16 +1,26 @@
-import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy  } from '@angular/core';
 import { webSocket } from 'rxjs/webSocket';
 import { Store, select } from '@ngrx/store';
 import { AppState } from './store/state/app.state';
 import { Observable, of, Subject,  } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { UIChart } from 'primeng/chart';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ColDef } from 'ag-grid-community';
 
 import { DataService } from './core/services/data.service';
+import { AgGridService } from './core/services/ag-grid.service';
 
 import { ApiActions } from './store/actions/api.actions';
+import { GetTransactions } from './store/actions/cash.action';
 
-import { selectApiReadCustomTasks$ } from './store/selectors/api.selector';
+/* import {
+  selectApiReadCustomTasks$,
+  selectApiReadCustomTask$,
+  selectApiReadCustomTasks
+} from './store/selectors/api.selector'; */
+
+import * as apiSelector from './store/selectors/api.selector';
 
 import { CustomTask } from './core/models/CustomTask.model';
 
@@ -20,18 +30,33 @@ import { CustomTask } from './core/models/CustomTask.model';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
+
+  @ViewChild('agGrid', null) agGrid!: AgGridAngular;
+  @ViewChild('chart', {static: false}) chart: UIChart;
+
   title = 'client-angular';
   message = 'Hello';
   barData$: Observable<any>;
-  @ViewChild('chart', {static: false}) chart: UIChart;
 
+  gridOptions = null;
   customTasks: CustomTask[];
 
+  columnDefs: any = [];
+
+  rowData: any = [];
+
+  tasks$: any;
+
+  debug = true;
+  debugErr = true;
+
+  /* readonly items$ = this.select(select(selectApiReadCustomTasks)); */
   private readonly destroy$ = new Subject<void>();
 
   constructor(
+    private store: Store<AppState>,
     private service: DataService,
-    private store: Store<AppState>
+    private agGridService: AgGridService,
   ) {
     // let tempData: any;
     // this.barData$ = of(this.barData);
@@ -44,18 +69,62 @@ export class AppComponent implements OnInit, OnDestroy {
       // this.barData$ = tempData;
       // this.chart.reinit();
     // });
+    this.store.dispatch(new GetTransactions({}));
   }
 
   ngOnInit() {
 
+    if (this.debug) {
+      console.log('AppComponent: ngOnInit()');
+    }
+
     this.store.dispatch(ApiActions.readCustomTasks());
 
     this.store
-    .pipe(selectApiReadCustomTasks$)
+    .pipe(apiSelector.selectApiReadCustomTasks$)
     .pipe(takeUntil(this.destroy$))
     .subscribe((customTasks: any) => {
-      this.customTasks = customTasks;
+      console.log('AppComponent: ngOnInit(): customTasks.entities: ', customTasks.entities);
+      for (const customTask in customTasks.entities) {
+        if (customTasks.entities.hasOwnProperty(customTask)) {
+          this.rowData.push(customTasks.entities[customTask]);
+        }
+      }
+      const rowData = this.agGridService.addExtraColumnsToTaskData(this.rowData);
+      const columnDefs = this.agGridService.createAgGridColumnDefs(this.customTasks);
+      if (this.debug) {
+        console.log('AppComponent: ngOnInit(): this.rowData: ', this.rowData);
+        console.log('AppComponent: ngOnInit(): this.columnDefs: ', this.columnDefs);
+      }
+      this.gridOptions = {
+          getRowId: params => params.data.id,
+          columnDefs,
+          rowData,
+          pagination: true,
+          paginationPageSize: 4,
+          defaultColDef: {
+            resizable: true,
+            sortable: true
+          },
+          onGridSizeChanged: (params) => {
+            if (this.debug) {
+              console.log('AgGridService initAgGrid(): onGridSizeChanged(): params: ', params);
+            }
+            if ('api' in this.agGrid.gridOptions) {
+              this.agGrid.gridOptions.api.sizeColumnsToFit();
+            }
+          },
+          onColumnResized: (params) => {
+            if (this.debug) {
+              console.log('AgGridService initAgGrid(): onColumnResized(): params: ', params);
+            }
+            // showButtons();
+          }
+      };
     });
+
+    this.gridOptions.onGridReady = () => {
+    };
 
   }
 

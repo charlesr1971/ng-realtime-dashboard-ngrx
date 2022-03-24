@@ -25,3 +25,17 @@ export const selectApiReadCustomTasks$ = pipe(
   select(selectApiCustomTaskState),
   filter((state) => state.status === EntityStatus.DONE)
 );
+
+export const selectApiReadCustomTasks = createSelector(
+  selectApiCustomTaskState,
+  apiCustomTasksEntityAdapter.getSelectors().selectAll
+);
+
+export const {
+  selectIds,
+  selectEntities,
+  selectAll,
+  selectTotal,
+} = apiCustomTasksEntityAdapter.getSelectors();
+
+

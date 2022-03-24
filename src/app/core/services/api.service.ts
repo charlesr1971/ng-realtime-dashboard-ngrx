@@ -89,6 +89,10 @@ export class ApiService {
 
   readCustomTasks(): Observable<CustomTask[]> {
 
+    if (this.debug) {
+      console.log('ApiService: readCustomTasks()');
+    }
+
     return this.http.get<any>(`${REST_ENDPOINT_URI}/${REST_API_READ_CUSTOM_TASKS}`).pipe(
       catchError((response) => {
         if (this.debugErr) {
