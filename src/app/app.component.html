@@ -14,6 +14,7 @@
       style="width: 99%; height: 600px;"
       class="ag-theme-alpine"
       [gridOptions]="gridOptions"
+      (gridReady)="onGridReady($event)"
   >
   </ag-grid-angular>
 </ng-container>

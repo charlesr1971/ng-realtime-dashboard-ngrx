@@ -1,0 +1,86 @@
+.mdl-layout__header .mdl-layout__drawer-button {
+  background-color: transparent;
+  top: 10px;
+}
+
+.light {
+  background: rgba(0,0,0,0.0125);
+}
+
+.container {
+  padding: 20px;
+}
+
+.mdl-data-table {
+  width: 100%;
+}
+
+.ag-header-cell.text-center .ag-header-cell-label {
+  top: 8px;
+  justify-content: center;
+}
+
+.update-header-text-center .ag-header-cell-label {
+  justify-content: center !important;
+}
+
+.ag-cell-value i {
+  color: rgb(0, 112, 60)  !important;
+}
+
+.mdl-layout-title {
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  padding-right: 40px;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+.ag-cell-focus,.ag-cell-no-focus{
+  border:none !important;
+}
+
+#ag-20 {
+  position: relative;
+}
+
+.button-add {
+  position: absolute;
+  left: 25px;
+  background-color: rgb(0, 112, 60) !important;
+  color: rgb(255, 255, 255) !important;
+  margin: 0 !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  width: 30px !important;
+  border-radius: 50%;
+}
+
+.button-delete-all {
+  position: absolute;
+  left: 65px;
+  background-color: rgb(0, 112, 60) !important;
+  color: rgb(255, 255, 255) !important;
+  margin: 0 !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  width: 30px !important;
+  border-radius: 50%;
+}
+
+.button-delete-all.mdl-button--fab[disabled][disabled], .button-add.mdl-button--fab[disabled][disabled]{
+  background-color: rgba(0,0,0, 0.12) !important;
+  cursor: default;
+}
+
+.button-add i, .button-delete-all i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  color:rgb(255, 255, 255);
+  cursor: pointer;
+}

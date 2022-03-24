@@ -1,4 +1,5 @@
-import { Component, ViewChild, OnInit, OnDestroy  } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy, Renderer2, Inject, ElementRef,  } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { webSocket } from 'rxjs/webSocket';
 import { Store, select } from '@ngrx/store';
 import { AppState } from './store/state/app.state';
@@ -47,6 +48,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   tasks$: any;
 
+  // $onOpenHasListener = false;
+
   debug = true;
   debugErr = true;
 
@@ -57,6 +60,9 @@ export class AppComponent implements OnInit, OnDestroy {
     private store: Store<AppState>,
     private service: DataService,
     private agGridService: AgGridService,
+    private renderer: Renderer2,
+    @Inject(DOCUMENT) private documentBody: Document,
+    public elementRef: ElementRef
   ) {
     // let tempData: any;
     // this.barData$ = of(this.barData);
@@ -108,7 +114,7 @@ export class AppComponent implements OnInit, OnDestroy {
           },
           onGridSizeChanged: (params) => {
             if (this.debug) {
-              console.log('AgGridService initAgGrid(): onGridSizeChanged(): params: ', params);
+              console.log('AppComponent: ngOnInit(): onGridSizeChanged(): params: ', params);
             }
             if ('api' in this.agGrid.gridOptions) {
               this.agGrid.gridOptions.api.sizeColumnsToFit();
@@ -116,15 +122,21 @@ export class AppComponent implements OnInit, OnDestroy {
           },
           onColumnResized: (params) => {
             if (this.debug) {
-              console.log('AgGridService initAgGrid(): onColumnResized(): params: ', params);
+              console.log('AppComponent: ngOnInit(): onColumnResized(): params: ', params);
             }
             // showButtons();
           }
       };
     });
 
-    this.gridOptions.onGridReady = () => {
-    };
+    this.service.onOpenHasListener$.subscribe( (bool) => {
+      if (this.debug) {
+        console.log('AppComponent: ngOnInit(): onOpenHasListener$: bool: ', bool);
+      }
+      if (bool === true) {
+        this.showButtons();
+      }
+    });
 
   }
 
@@ -157,6 +169,80 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // }
   }
+
+  onGridReady($event) {
+    this.gridOptions.api.sizeColumnsToFit();
+    const ag20 = this.documentBody.querySelector('#ag-20');
+    if (ag20) {
+      let addButton = this.renderer.createElement('button');
+      // tslint:disable-next-line: max-line-length
+      this.renderer.setAttribute(addButton, 'class', 'mdl-button mdl-js-ripple-effect mdl-button--raised mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored button-add');
+      this.renderer.setAttribute(addButton, 'id', 'button-add');
+      this.renderer.setAttribute(addButton, 'disabled', 'disabled');
+      this.renderer.setAttribute(addButton, 'onclick', 'sendCreate()');
+      let addIcon = this.renderer.createElement('i');
+      this.renderer.setAttribute(addIcon, 'class', 'material-icons');
+      let newContent = this.renderer.createText('add');
+      this.renderer.appendChild(addIcon, newContent);
+      this.renderer.appendChild(addButton, addIcon);
+      this.renderer.appendChild(ag20, addButton);
+      addButton = this.renderer.createElement('button');
+      // tslint:disable-next-line: max-line-length
+      this.renderer.setAttribute(addButton, 'class', 'mdl-button mdl-js-ripple-effect mdl-button--raised mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--accent button-delete-all');
+      this.renderer.setAttribute(addButton, 'id', 'button-delete-all');
+      this.renderer.setAttribute(addButton, 'disabled', 'disabled');
+      this.renderer.setAttribute(addButton, 'onclick', 'sendDeleteAll()');
+      addIcon = this.renderer.createElement('i');
+      this.renderer.setAttribute(addIcon, 'class', 'material-icons');
+      newContent = this.renderer.createText('delete');
+      this.renderer.appendChild(addIcon, newContent);
+      this.renderer.appendChild(addButton, addIcon);
+      this.renderer.appendChild(ag20, addButton);
+      // componentHandler.upgradeDom();
+    }
+  }
+
+  showButtons() {
+    const buttonAdd = document.querySelector('#button-add');
+    const buttonDeleteAll = document.querySelector('#button-delete-all');
+    if (buttonAdd) {
+      const disabled =  this.documentBody.querySelector('#button-add').getAttribute('disabled');
+      if (this.debug) {
+        console.log('AppComponent: showButtons(): buttonAdd: disabled: ', disabled);
+      }
+      const hasDisabled = typeof disabled !== typeof undefined ? true : false;
+      if (this.debug) {
+        console.log('AppComponent: showButtons(): buttonAdd: hasDisabled: ', hasDisabled);
+      }
+      if (hasDisabled) {
+        this.renderer.removeAttribute(buttonAdd, 'disabled');
+        if (this.debug) {
+          console.log('AppComponent: showButtons(): buttonAdd: ', buttonAdd);
+        }
+      }
+    }
+    if (buttonDeleteAll) {
+      const disabled =  this.documentBody.querySelector('#button-delete-all').getAttribute('disabled');
+      if (this.debug) {
+        console.log('AppComponent: showButtons(): buttonDeleteAll: disabled: ', disabled);
+      }
+      const hasDisabled = typeof disabled !== typeof undefined ? true : false;
+      if (this.debug) {
+        console.log('AppComponent: showButtons(): buttonDeleteAll: hasDisabled: ', hasDisabled);
+      }
+      if (hasDisabled) {
+        this.renderer.removeAttribute(buttonDeleteAll, 'disabled');
+        if (this.debug) {
+          console.log('AppComponent: showButtons(): buttonDeleteAll: ', buttonDeleteAll);
+        }
+      }
+    }
+  }
+
+  sendCreate() {
+    // this.store.dispatch(ApiActions.createCustomTask({}));
+  }
+
   unsubscribe($event) {
     this.service.connect().unsubscribe();
   }
