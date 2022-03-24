@@ -1,5 +1,5 @@
 export interface CustomTask {
-  id: string;
+  id?: string;
   name?: string;
   assignee?: string;
   created?: string;

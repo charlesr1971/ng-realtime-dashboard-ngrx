@@ -1,25 +1,24 @@
-import { Component, ViewChild, OnInit, OnDestroy, Renderer2, Inject, ElementRef,  } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy, Renderer2, Inject, ElementRef, AfterViewInit  } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { webSocket } from 'rxjs/webSocket';
 import { Store, select } from '@ngrx/store';
 import { AppState } from './store/state/app.state';
 import { Observable, of, Subject,  } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, map } from 'rxjs/operators';
 import { UIChart } from 'primeng/chart';
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef } from 'ag-grid-community';
+import {
+  ColDef,
+  GridApi,
+  GridReadyEvent,
+} from 'ag-grid-community';
 
 import { DataService } from './core/services/data.service';
 import { AgGridService } from './core/services/ag-grid.service';
+import { UtilsService } from './core/services/utils.service';
 
 import { ApiActions } from './store/actions/api.actions';
 import { GetTransactions } from './store/actions/cash.action';
-
-/* import {
-  selectApiReadCustomTasks$,
-  selectApiReadCustomTask$,
-  selectApiReadCustomTasks
-} from './store/selectors/api.selector'; */
 
 import * as apiSelector from './store/selectors/api.selector';
 
@@ -46,15 +45,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   rowData: any = [];
 
-  tasks$: any;
-
-  // $onOpenHasListener = false;
-
   debug = true;
   debugErr = true;
 
-  /* readonly items$ = this.select(select(selectApiReadCustomTasks)); */
   private readonly destroy$ = new Subject<void>();
+  private gridApi!: GridApi;
 
   constructor(
     private store: Store<AppState>,
@@ -62,7 +57,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private agGridService: AgGridService,
     private renderer: Renderer2,
     @Inject(DOCUMENT) private documentBody: Document,
-    public elementRef: ElementRef
+    public elementRef: ElementRef,
+    private utilsService: UtilsService
   ) {
     // let tempData: any;
     // this.barData$ = of(this.barData);
@@ -75,7 +71,7 @@ export class AppComponent implements OnInit, OnDestroy {
       // this.barData$ = tempData;
       // this.chart.reinit();
     // });
-    this.store.dispatch(new GetTransactions({}));
+    //this.store.dispatch(new GetTransactions({}));
   }
 
   ngOnInit() {
@@ -91,16 +87,23 @@ export class AppComponent implements OnInit, OnDestroy {
     .pipe(takeUntil(this.destroy$))
     .subscribe((customTasks: any) => {
       console.log('AppComponent: ngOnInit(): customTasks.entities: ', customTasks.entities);
+      this.rowData = [];
       for (const customTask in customTasks.entities) {
         if (customTasks.entities.hasOwnProperty(customTask)) {
           this.rowData.push(customTasks.entities[customTask]);
         }
       }
       const rowData = this.agGridService.addExtraColumnsToTaskData(this.rowData);
-      const columnDefs = this.agGridService.createAgGridColumnDefs(this.customTasks);
+      const columnDefs = this.agGridService.createAgGridColumnDefs();
+      this.rowData = rowData;
+      try{
+        this.createAgGrid(rowData);
+      }
+      catch(e) {
+      }
       if (this.debug) {
-        console.log('AppComponent: ngOnInit(): this.rowData: ', this.rowData);
-        console.log('AppComponent: ngOnInit(): this.columnDefs: ', this.columnDefs);
+        console.log('AppComponent: ngOnInit(): rowData: ', rowData);
+        console.log('AppComponent: ngOnInit(): columnDefs: ', columnDefs);
       }
       this.gridOptions = {
           getRowId: params => params.data.id,
@@ -129,13 +132,22 @@ export class AppComponent implements OnInit, OnDestroy {
       };
     });
 
-    this.service.onOpenHasListener$.subscribe( (bool) => {
+    this.service.connect().pipe(
+      map(
+        result => {
+          if (this.debug) {
+            console.log('AppComponent: ngOnInit(): connect(): pipe: result: ', result);
+          }
+          return result;
+        }
+      )
+    );
+
+    this.service.connect().subscribe( (message) => {
       if (this.debug) {
-        console.log('AppComponent: ngOnInit(): onOpenHasListener$: bool: ', bool);
+        console.log('AppComponent: ngOnInit(): connect(): subscribe: message: ', message);
       }
-      if (bool === true) {
-        this.showButtons();
-      }
+      this.store.dispatch(ApiActions.readCustomTasks());
     });
 
   }
@@ -170,7 +182,7 @@ export class AppComponent implements OnInit, OnDestroy {
     // }
   }
 
-  onGridReady($event) {
+  onGridReady(params: GridReadyEvent) {
     this.gridOptions.api.sizeColumnsToFit();
     const ag20 = this.documentBody.querySelector('#ag-20');
     if (ag20) {
@@ -179,7 +191,6 @@ export class AppComponent implements OnInit, OnDestroy {
       this.renderer.setAttribute(addButton, 'class', 'mdl-button mdl-js-ripple-effect mdl-button--raised mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored button-add');
       this.renderer.setAttribute(addButton, 'id', 'button-add');
       this.renderer.setAttribute(addButton, 'disabled', 'disabled');
-      this.renderer.setAttribute(addButton, 'onclick', 'sendCreate()');
       let addIcon = this.renderer.createElement('i');
       this.renderer.setAttribute(addIcon, 'class', 'material-icons');
       let newContent = this.renderer.createText('add');
@@ -191,7 +202,6 @@ export class AppComponent implements OnInit, OnDestroy {
       this.renderer.setAttribute(addButton, 'class', 'mdl-button mdl-js-ripple-effect mdl-button--raised mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--accent button-delete-all');
       this.renderer.setAttribute(addButton, 'id', 'button-delete-all');
       this.renderer.setAttribute(addButton, 'disabled', 'disabled');
-      this.renderer.setAttribute(addButton, 'onclick', 'sendDeleteAll()');
       addIcon = this.renderer.createElement('i');
       this.renderer.setAttribute(addIcon, 'class', 'material-icons');
       newContent = this.renderer.createText('delete');
@@ -199,12 +209,45 @@ export class AppComponent implements OnInit, OnDestroy {
       this.renderer.appendChild(addButton, addIcon);
       this.renderer.appendChild(ag20, addButton);
       // componentHandler.upgradeDom();
+      this.service.onOpenHasListener$.subscribe( (bool) => {
+        if (this.debug) {
+          console.log('AppComponent: ngOnInit(): onOpenHasListener$: bool: ', bool);
+        }
+        if (bool === true) {
+          this.showButtons();
+        }
+      });
+      const buttonAdd = document.querySelector('#button-add');
+      if (buttonAdd) {
+        this.renderer.listen(buttonAdd, 'click', () => {
+          this.sendCreate();
+        });
+      }
+      const buttonDeleteAll = document.querySelector('#button-delete-all');
+      if (buttonDeleteAll) {
+        this.renderer.listen(buttonDeleteAll, 'click', () => {
+          // this.sendDeleteAll();
+        });
+      }
     }
+    this.gridApi = params.api;
   }
+
+  createAgGrid(data) {
+	  const array = this.utilsService.sortArrayOfObjects(data,"id","asc","text");
+    if (this.debug) {
+      console.log('AppComponent: createAgGrid(): array: ', array);
+    }
+	  this.gridApi.setRowData(array);
+    this.gridApi.redrawRows();
+	}
 
   showButtons() {
     const buttonAdd = document.querySelector('#button-add');
     const buttonDeleteAll = document.querySelector('#button-delete-all');
+    if (this.debug) {
+      console.log('AppComponent: showButtons()');
+    }
     if (buttonAdd) {
       const disabled =  this.documentBody.querySelector('#button-add').getAttribute('disabled');
       if (this.debug) {
@@ -240,7 +283,8 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   sendCreate() {
-    // this.store.dispatch(ApiActions.createCustomTask({}));
+    const customTask = this.service.createCustomTask();
+    this.store.dispatch(ApiActions.createCustomTask({customTask}));
   }
 
   unsubscribe($event) {

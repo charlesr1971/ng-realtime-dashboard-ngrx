@@ -28,19 +28,7 @@ export class ApiService {
 
   createCustomTask(customTask: CustomTask): Observable<any> {
 
-    if (Object.keys(customTask).length === 0) {
-      /* if ('update' in customTask) {
-        delete customTask.update;
-      }
-      if (customTask?.deletes) {
-        delete customTask.deletes;
-      }
-      if (customTask?.id) {
-        customTask.id = null;
-      }
-      if (customTask?.status) {
-        customTask.status = 'CREATED';
-      } */
+    if (Object.keys(customTask).length !== 0) {
       if ('update' in customTask) {
         delete customTask.update;
       }
@@ -58,6 +46,8 @@ export class ApiService {
     if (this.debug) {
       console.log('ApiService: createCustomTask(): customTask: ', customTask);
     }
+
+    // const options = {headers: {'Content-Type': 'application/json'}};
 
     return this.http.post<any>(`${REST_ENDPOINT_URI}/${REST_API_CREATE_CUSTOM_TASK}`, { ...customTask }).pipe(
       catchError((response) => {
@@ -106,19 +96,7 @@ export class ApiService {
 
   patchCustomTask(id: string, customTask: CustomTask): Observable<any> {
 
-    if (Object.keys(customTask).length === 0) {
-      /* if (customTask?.update) {
-        delete customTask.update;
-      }
-      if (customTask?.deletes) {
-        delete customTask.deletes;
-      }
-      if (customTask?.id) {
-        customTask.id = null;
-      }
-      if (customTask?.status) {
-        customTask.status = 'PATCHED';
-      } */
+    if (Object.keys(customTask).length !== 0) {
       if ('update' in customTask) {
         delete customTask.update;
       }
@@ -160,19 +138,7 @@ export class ApiService {
 
   updateCustomTask(customTask: CustomTask): Observable<any> {
 
-    if (Object.keys(customTask).length === 0) {
-      /* if (customTask?.update) {
-        delete customTask.update;
-      }
-      if (customTask?.deletes) {
-        delete customTask.deletes;
-      }
-      if (customTask?.id) {
-        customTask.id = null;
-      }
-      if (customTask?.status) {
-        customTask.status = 'UPDATE';
-      } */
+    if (Object.keys(customTask).length !== 0) {
       if ('update' in customTask) {
         delete customTask.update;
       }

@@ -1,93 +1,101 @@
 {
-  "extends": "tslint:recommended",
-  "rules": {
-    "array-type": false,
-    "arrow-parens": false,
-    "deprecation": {
-      "severity": "warning"
-    },
-    "component-class-suffix": true,
-    "contextual-lifecycle": true,
-    "directive-class-suffix": true,
-    "directive-selector": [
-      true,
-      "attribute",
-      "app",
-      "camelCase"
-    ],
-    "component-selector": [
-      true,
-      "element",
-      "app",
-      "kebab-case"
-    ],
-    "import-blacklist": [
-      true,
-      "rxjs/Rx"
-    ],
-    "interface-name": false,
-    "max-classes-per-file": false,
-    "max-line-length": [
-      true,
-      140
-    ],
-    "member-access": false,
-    "member-ordering": [
-      true,
-      {
-        "order": [
-          "static-field",
-          "instance-field",
-          "static-method",
-          "instance-method"
-        ]
+  "root": true,
+  "ignorePatterns": [
+    "app/**/*",
+    "dist/**/*",
+    "release/**/*",
+    "src/app/shared/utils/**/*",
+    "src/app/core/services/utils/**/*"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "*.ts"
+      ],
+      "parserOptions": {
+        "project": [
+          "./tsconfig.serve.json",
+          "./src/tsconfig.app.json",
+          "./src/tsconfig.spec.json",
+          "./e2e/tsconfig.e2e.json"
+        ],
+        "createDefaultProgram": true
+      },
+      "extends": [
+        "plugin:@angular-eslint/ng-cli-compat",
+        "plugin:@angular-eslint/ng-cli-compat--formatting-add-on",
+        "plugin:@angular-eslint/template/process-inline-templates"
+      ],
+      "rules": {
+        "prefer-arrow/prefer-arrow-functions": 0,
+        "@angular-eslint/directive-selector":  0,
+        "@angular-eslint/component-selector": 0,
+        "@typescript-eslint/naming-convention": [
+          "error",
+          {
+            "selector": "default",
+            "format": ["camelCase", "UPPER_CASE", "snake_case", "PascalCase"],
+            "leadingUnderscore": "allow",
+            "trailingUnderscore": "allow"
+          },
+          {
+            "selector": ["variable", "property"],
+            "format": ["camelCase", "UPPER_CASE", "snake_case", "PascalCase"],
+            "leadingUnderscore": "allow",
+            "trailingUnderscore": "allow"
+          },
+          {
+            "selector": "typeLike",
+            "format": ["camelCase", "UPPER_CASE", "snake_case", "PascalCase"]
+          },
+          {
+            "selector": "typeParameter",
+            "format": ["camelCase", "UPPER_CASE", "snake_case", "PascalCase"]
+          },
+          {
+            "selector": "enumMember",
+            "format": ["camelCase", "UPPER_CASE", "snake_case", "PascalCase"]
+          }
+        ],
+        "max-len": [
+          "error",
+          {
+            "code": 1000,
+            "ignoreUrls": true,
+            "ignorePattern": "^import\\s+.*"
+          }
+        ],
+        "@typescript-eslint/quotes": ["error", "single", { "avoidEscape": true, "allowTemplateLiterals": false }],
+        "space-before-function-paren": ["error", {
+            "anonymous": "ignore",
+            "named": "ignore",
+            "asyncArrow": "ignore"
+        }],
+        "jsdoc/no-types": 0,
+        "no-underscore-dangle": 0,
+        "guard-for-in": 0,
+        "@typescript-eslint/no-unused-expressions": 0,
+        "arrow-body-style": 0,
+        "@typescript-eslint/member-ordering": 0,
+        "radix": 0,
+        "@angular-eslint/template/eqeqeq": 0,
+        "@typescript-eslint/no-inferrable-types": 0,
+        "@typescript-eslint/prefer-for-of": 0,
+        "@typescript-eslint/consistent-type-assertions": 0,
+        "@typescript-eslint/no-shadow": 0,
+        "object-shorthand": 0,
+        "one-var": 0
       }
-    ],
-    "no-consecutive-blank-lines": false,
-    "no-console": [
-      true,
-      "debug",
-      "info",
-      "time",
-      "timeEnd",
-      "trace"
-    ],
-    "no-empty": false,
-    "no-inferrable-types": [
-      true,
-      "ignore-params"
-    ],
-    "no-non-null-assertion": true,
-    "no-redundant-jsdoc": true,
-    "no-switch-case-fall-through": true,
-    "no-use-before-declare": true,
-    "no-var-requires": false,
-    "object-literal-key-quotes": [
-      true,
-      "as-needed"
-    ],
-    "object-literal-sort-keys": false,
-    "ordered-imports": false,
-    "quotemark": [
-      true,
-      "single"
-    ],
-    "trailing-comma": false,
-    "no-conflicting-lifecycle": true,
-    "no-host-metadata-property": true,
-    "no-input-rename": true,
-    "no-inputs-metadata-property": true,
-    "no-output-native": true,
-    "no-output-on-prefix": true,
-    "no-output-rename": true,
-    "no-outputs-metadata-property": true,
-    "template-banana-in-box": true,
-    "template-no-negated-async": true,
-    "use-lifecycle-interface": true,
-    "use-pipe-transform-interface": true,
-    "no-shadowed-variable": false
-  },
-  "rulesDirectory": [
-    "codelyzer"
+    },
+    {
+      "files": [
+        "*.html"
+      ],
+      "extends": [
+        "plugin:@angular-eslint/template/recommended"
+      ],
+      "rules": {
+      }
+    }
   ]
 }

@@ -65,7 +65,7 @@ export class AgGridService {
     return Object.keys(obj);
   }
 
-  createAgGridColumnDefs(obj) {
+  createAgGridColumnDefs() {
     const columnDefs = [];
     columnDefs.push({
       field: 'id',
@@ -125,10 +125,13 @@ export class AgGridService {
       sortable: true,
       unSortIcon: true
     });
+    if (this.debug) {
+      console.log('AgGridService createAgGridColumnDefs(): columnDefs: ', columnDefs);
+    }
     return columnDefs;
   }
 
-  initAgGrid(data) {
+  /* initAgGrid(data) {
     return {
       gridOptions: null,
       init(el) {
@@ -209,7 +212,7 @@ export class AgGridService {
         rowNode.setDataValue('status', 'updated');
       }
     };
-  }
+  } */
 
 
 }
