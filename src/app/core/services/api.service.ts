@@ -29,7 +29,7 @@ export class ApiService {
   createCustomTask(customTask: CustomTask): Observable<any> {
 
     if (Object.keys(customTask).length === 0) {
-      if (customTask?.update) {
+      /* if ('update' in customTask) {
         delete customTask.update;
       }
       if (customTask?.deletes) {
@@ -39,7 +39,19 @@ export class ApiService {
         customTask.id = null;
       }
       if (customTask?.status) {
-        customTask.status = 'CREATE';
+        customTask.status = 'CREATED';
+      } */
+      if ('update' in customTask) {
+        delete customTask.update;
+      }
+      if ('deletes' in customTask) {
+        delete customTask.deletes;
+      }
+      if ('id' in customTask) {
+        customTask.id = null;
+      }
+      if ('status' in customTask) {
+        customTask.status = 'CREATED';
       }
     }
 
@@ -91,7 +103,7 @@ export class ApiService {
   patchCustomTask(id: string, customTask: CustomTask): Observable<any> {
 
     if (Object.keys(customTask).length === 0) {
-      if (customTask?.update) {
+      /* if (customTask?.update) {
         delete customTask.update;
       }
       if (customTask?.deletes) {
@@ -101,6 +113,18 @@ export class ApiService {
         customTask.id = null;
       }
       if (customTask?.status) {
+        customTask.status = 'PATCHED';
+      } */
+      if ('update' in customTask) {
+        delete customTask.update;
+      }
+      if ('deletes' in customTask) {
+        delete customTask.deletes;
+      }
+      if ('id' in customTask) {
+        customTask.id = null;
+      }
+      if ('status' in customTask) {
         customTask.status = 'PATCHED';
       }
     }
@@ -133,7 +157,7 @@ export class ApiService {
   updateCustomTask(customTask: CustomTask): Observable<any> {
 
     if (Object.keys(customTask).length === 0) {
-      if (customTask?.update) {
+      /* if (customTask?.update) {
         delete customTask.update;
       }
       if (customTask?.deletes) {
@@ -144,6 +168,18 @@ export class ApiService {
       }
       if (customTask?.status) {
         customTask.status = 'UPDATE';
+      } */
+      if ('update' in customTask) {
+        delete customTask.update;
+      }
+      if ('deletes' in customTask) {
+        delete customTask.deletes;
+      }
+      if ('id' in customTask) {
+        customTask.id = null;
+      }
+      if ('status' in customTask) {
+        customTask.status = 'UPDATED';
       }
     }
 

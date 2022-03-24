@@ -1,22 +1,38 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { webSocket } from 'rxjs/webSocket';
-import { DataService } from './core/services/data.service';
-import { Observable } from 'rxjs';
-import { of } from 'rxjs';
+import { Store, select } from '@ngrx/store';
+import { AppState } from './store/state/app.state';
+import { Observable, of, Subject,  } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { UIChart } from 'primeng/chart';
+
+import { DataService } from './core/services/data.service';
+
+import { ApiActions } from './store/actions/api.actions';
+
+import { selectApiReadCustomTasks$ } from './store/selectors/api.selector';
+
+import { CustomTask } from './core/models/CustomTask.model';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'client-angular';
   message = 'Hello';
   barData$: Observable<any>;
   @ViewChild('chart', {static: false}) chart: UIChart;
 
-  constructor(private service: DataService) {
+  customTasks: CustomTask[];
+
+  private readonly destroy$ = new Subject<void>();
+
+  constructor(
+    private service: DataService,
+    private store: Store<AppState>
+  ) {
     // let tempData: any;
     // this.barData$ = of(this.barData);
     // this.service.wsSubject().subscribe(msg => {
@@ -28,6 +44,19 @@ export class AppComponent {
       // this.barData$ = tempData;
       // this.chart.reinit();
     // });
+  }
+
+  ngOnInit() {
+
+    this.store.dispatch(ApiActions.readCustomTasks());
+
+    this.store
+    .pipe(selectApiReadCustomTasks$)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((customTasks: any) => {
+      this.customTasks = customTasks;
+    });
+
   }
 
   sendToServer($event) {
@@ -66,4 +95,10 @@ export class AppComponent {
   subscribe($event) {
     this.service.connect().subscribe();
   }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
+  }
+
 }

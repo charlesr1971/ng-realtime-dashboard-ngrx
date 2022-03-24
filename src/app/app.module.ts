@@ -17,6 +17,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { appReducers } from './store/reducers/app.reducers';
 import { TransactionEffects } from './store/effects/transaction.effect';
+import { apisFeatureKey, apisReducer } from './store/reducers/api.reducer';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,7 @@ import { TransactionEffects } from './store/effects/transaction.effect';
     HttpClientModule,
     StoreModule.forRoot(appReducers),
     EffectsModule.forRoot([TransactionEffects]),
-
+    StoreModule.forFeature(apisFeatureKey, apisReducer),
   ],
   providers: [],
   bootstrap: [AppComponent]

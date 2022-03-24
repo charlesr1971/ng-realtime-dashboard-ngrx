@@ -11,6 +11,7 @@ import { Store, select } from '@ngrx/store';
 import { selectTransactionsStream } from '../store/selectors/transaction.selector';
 import { AppState } from '../store/state/app.state';
 import { GetTransactions } from '../store/actions/cash.action';
+import { ApiActions } from '../store/actions/api.actions';
 import { ITransaction } from '../core/models/Transaction.model';
 import { tap, map } from 'rxjs/operators';
 
